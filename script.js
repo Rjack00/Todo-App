@@ -10,7 +10,7 @@ const titleInput = document.getElementById("title-input");
 const dateInput = document.getElementById("date-input");
 const descriptionInput = document.getElementById("description-input");
 
-const taskData = [];
+const taskData = JSON.parse(localStorage.getItem("data")) || [];
 let currentTask = {};
 
 const addOrUpdateTask = () => {
@@ -27,6 +27,7 @@ const addOrUpdateTask = () => {
     taskData[dataArrIndex] = taskObj;
   }
 
+  localStorage.setItem("data", JSON.stringify(taskData));
   updateTaskContainer();
   reset();
 }
@@ -55,6 +56,8 @@ const deleteTask = (buttonEl) => {
 
   buttonEl.parentElement.remove();
   taskData.splice(dataArrIndex, 1);
+  //after above splice setItem will update localStorage
+  localStorage.setItem("data", JSON.stringify(taskData));
 }
 
 const editTask = (buttonEl) => {
@@ -74,11 +77,16 @@ taskForm.classList.toggle("hidden");
 }
 
 const reset = () => {
+  addOrUpdateTaskBtn.innerText = "Add Task";
   titleInput.value = "";
   dateInput.value = "";
   descriptionInput.value = "";
   taskForm.classList.toggle("hidden");
   currentTask = {};
+}
+
+if(taskData.length) {
+  updateTaskContainer();
 }
 
 openTaskFormBtn.addEventListener("click", () =>
@@ -88,8 +96,8 @@ openTaskFormBtn.addEventListener("click", () =>
 closeTaskFormBtn.addEventListener("click", () => {
   const formInputsContainValues = titleInput.value || dateInput.value || descriptionInput.value;
   const formInputValuesUpdated = titleInput.value !== currentTask.title || dateInput.value !== currentTask.date || descriptionInput.value !== currentTask.description;
-  
-  if (formInputsContainValues) {
+
+  if (formInputsContainValues && formInputValuesUpdated) {
     confirmCloseDialog.showModal();
   } else {
     reset();
@@ -112,3 +120,28 @@ taskForm.addEventListener("submit", (e) => {
     e.preventDefault();
     addOrUpdateTask();
 });
+
+
+
+
+// // example code to learn browser localStorage commands //
+// const myTaskArr = [
+//   { task: "Walk the Dog", date: "22-04-2022" },
+//   { task: "Read some books", date: "02-11-2023" },
+//   { task: "Watch football", date: "10-08-2021" },
+// ];
+
+// //saves to local storage(items should be JSON.stringify() when saved to browser local storage) (used in this app)
+// localStorage.setItem("data", JSON.stringify(myTaskArr)); 
+
+// // deletes all local storage items (not used in this app)
+// localStorage.clear();
+
+// // deletes specified local storage items (not used in this app)
+// localStorage.removeItem(); 
+
+// // will retrieve in string form as saved (not used in this app)
+// const getTaskArr = localStorage.getItem("data");
+
+// // will retrieve in original form (not string) (used in this app)
+// const getTaskArrObj = JSON.parse(localStorage.getItem("data")); 
